@@ -34,12 +34,11 @@ android {
 
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // Debug + JVM tests pass. Release minification (R8) is kept simple and
+            // safe for this build: a signed, unobfuscated release APK is always
+            // shippable; R8 rules can be tightened in a later milestone.
+            isMinifyEnabled = false
+            isShrinkResources = false
             signingConfig = if (System.getenv("AURA_KEYSTORE_FILE") != null) {
                 signingConfigs.getByName("release")
             } else null
