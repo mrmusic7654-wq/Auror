@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AURA Orchestrator</string>
+    <string name="dashboard">Home</string>
+    <string name="agents">Agents</string>
+    <string name="projects">Projects</string>
+    <string name="tools">Tools</string>
+    <string name="settings">Settings</string>
+    <string name="ready">Ready</string>
+    <string name="input_hint">What should we accomplish?</string>
+</resources>
