@@ -26,10 +26,9 @@ data class PermissionPolicy(
 
 sealed interface Grant {
     val capability: String
-    val scopeId: String?
     data class Once(override val capability: String, val scopeId: String? = null) : Grant
-    data class ForTask(override val capability: String, override val scopeId: String) : Grant
-    data class ForProject(override val capability: String, override val scopeId: String) : Grant
+    data class ForTask(override val capability: String, val scopeId: String) : Grant
+    data class ForProject(override val capability: String, val scopeId: String) : Grant
     data class Always(override val capability: String, val scopeId: String? = null) : Grant
 }
 

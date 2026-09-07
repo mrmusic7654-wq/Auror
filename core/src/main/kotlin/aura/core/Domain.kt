@@ -55,6 +55,7 @@ object Capabilities {
     const val MODEL_CHAT = "model.chat"
     const val DATA_ANALYZE = "data.analyze"
     const val NOTE = "memory.note"
+    const val MEMORY_NOTE = "memory.note"
     const val MEMORY_READ = "memory.read"
     const val MEMORY_DELETE = "memory.delete"
     const val MINIAPP_INVOKE = "miniapp.invoke"
@@ -65,7 +66,7 @@ object Capabilities {
  * this when deciding whether an operation may proceed without asking the user.
  */
 object PermissionCatalog {
-    val sensitivity: Map<String, RiskLevel> = mapOf(
+    val sensitivity: Map<String, RiskLevel> = mapOf<String, RiskLevel>(
         Capabilities.FILES_READ to RiskLevel.LOW,
         Capabilities.FILES_LIST to RiskLevel.LOW,
         Capabilities.FILES_WRITE to RiskLevel.MEDIUM,
