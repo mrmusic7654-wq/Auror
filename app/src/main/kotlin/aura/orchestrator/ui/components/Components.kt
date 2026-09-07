@@ -120,7 +120,6 @@ fun DragonCore(
             val cy = h / 2f
             val c = Offset(cx, cy)
             val r = minOf(w, h) / 2f
-            val stroke = androidx.compose.ui.graphics.drawscope.Stroke
             // soft outer glow
             drawCircle(
                 brush = Brush.radialGradient(
@@ -130,9 +129,9 @@ fun DragonCore(
                 radius = r, center = c
             )
             // flowing ring(s)
-            drawCircle(color = state.glow.copy(alpha = 0.9f), radius = r * 0.52f, center = c, style = stroke(width = 2.dp.toPx()))
+            drawCircle(color = state.glow.copy(alpha = 0.9f), radius = r * 0.52f, center = c, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx()))
             if (radiusScale > 0f) {
-                drawCircle(color = state.glow.copy(alpha = 0.5f), radius = r * (0.6f + radiusScale), center = c, style = stroke(width = 1.5.dp.toPx()))
+                drawCircle(color = state.glow.copy(alpha = 0.5f), radius = r * (0.6f + radiusScale), center = c, style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.5.dp.toPx()))
             }
             // core
             drawCircle(

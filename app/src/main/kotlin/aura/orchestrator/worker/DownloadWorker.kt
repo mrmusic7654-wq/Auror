@@ -53,16 +53,17 @@ class DownloadWorker(
                 val contentLength = body.contentLength()
                 val fileName = pickFileName(response.header("Content-Disposition"), url)
                 val out = File(destDir, fileName)
-                val sink = body.source()
-                val buffer = okio.Buffer()
+                val input = body.byteStream()
+                val chunk = ByteArray(8192)
                 val downloaded = AtomicInteger(0)
                 val outStream = out.outputStream()
                 outStream.use { os ->
-                    while (!sink.exhausted()) {
-                        val n = sink.read(buffer, 8192)
-                        if (n < 0) break
-                        buffer.copyTo(os, n)
-                        downloaded.addAndGet(n)
+                    var read = input.read(chunk)
+                    while (read != -1) {
+                        if (read > 0) {
+                            os.write(chunk, 0, read)
+                            downloaded.addAndGet(read)
+                        }
                         val total = downloaded.get().toLong()
                         if (contentLength > 0) {
                             val percent = (total * 100L / contentLength).toInt().coerceIn(0, 100)
@@ -72,6 +73,7 @@ class DownloadWorker(
                                     updatedAtEpochMs = System.currentTimeMillis()))
                             }
                         }
+                        read = input.read(chunk)
                     }
                 }
                 val size = out.length()
