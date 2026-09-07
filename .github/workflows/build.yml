@@ -9,6 +9,8 @@ jobs:
   build:
     name: Build, test, package APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx3g -Dfile.encoding=UTF-8
     steps:
@@ -42,21 +44,29 @@ jobs:
           ./gradlew :core:test --stacktrace 2>&1 | tee /tmp/build.log
           ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee -a /tmp/build.log
 
-      - name: Publish compile errors to an issue (on failure)
+      - name: Commit build log back to branch (on compile failure)
         if: failure()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
         shell: bash
         run: |
+          set +e
+          [ -f /tmp/build.log ] || exit 0
+          mkdir -p ci
           {
-            echo "## AURA CI build failed ($(date -u +%Y-%m-%dT%H:%MZ))"
-            echo
+            echo "### Build log — run ${GITHUB_RUN_ID} $(date -u)"
             echo '```'
-            grep -aE "e: |error:|FAILURE:|What went wrong|Caused by:|Unresolved reference|cannot|> Task .* FAILED|Could not|Exception" /tmp/build.log | head -400
+            grep -aE "e: |error:|FAILURE:|What went wrong|Caused by:|Unresolved reference|cannot find|could not|not found|Exception|> Task .* FAILED|Execution failed" /tmp/build.log | head -300
             echo '```'
-          } > /tmp/body.md
-          gh issue create --title "AURA CI build failure" --body-file /tmp/body.md --label "ci-fail" >/dev/null 2>&1 || \
-            gh issue create --title "AURA CI build failure" --body-file /tmp/body.md >/dev/null 2>&1 || true
+          } > ci/build-log.md
+          git config user.email "ci-bot@users.noreply.github.com"
+          git config user.name "ci-bot"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          git add ci/build-log.md
+          git commit -m "ci: build log [skip ci]" >/dev/null 2>&1 || exit 0
+          git push origin "HEAD:${BRANCH}" >/dev/null 2>&1 || echo "push failed"
 
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
