@@ -17,9 +17,18 @@ by CI (this sandbox's egress blocks `dl.google.com` / Maven Central / Gradle). P
 and CI compiles, runs the JVM tests and uploads **signed debug and release APKs** as workflow
 artifacts.
 
+> ✅ **Build status: green.** The latest run
+> [34122024066](https://github.com/mrmusic7654-wq/Auror/actions/runs/34122024066) compiles `core` +
+> `app`, passes the JVM unit tests, and produces a **signed `aura-release-apk`** (~8.8 MB) plus a
+> debug APK. Download them from the run's **Artifacts** panel (Actions → "AURA Build & Test" → latest
+> run → Artifacts). CI signs the release with a CI-provisioned self-signed key so no private key
+> lives in the repository.
+
 ```bash
 ./gradlew :app:assembleDebug          # debug APK
+./gradlew :app:assembleRelease        # signed release APK
 ./gradlew :app:testDebugUnitTest      # JVM unit tests
+./gradlew :core:test                  # core module tests
 ```
 
 Locally you only need the Android SDK (AGP auto-downloads missing packages when online).
