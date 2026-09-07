@@ -144,6 +144,16 @@ function makeVehicle(kind, color) {
   br.position.set(0.55, 0.55, -len / 2 - 0.02)
   g.add(hl, hr, bl, br)
 
+  const bumper = new THREE.Mesh(new THREE.BoxGeometry(wid * 1.02, 0.18, 0.22), dark)
+  bumper.position.set(0, 0.38, len / 2 + 0.02)
+  const bumperR = bumper.clone()
+  bumperR.position.z = -len / 2 - 0.02
+  const mirrorL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.18), dark)
+  const mirrorR = mirrorL.clone()
+  mirrorL.position.set(-wid / 2 - 0.08, body.position.y + 0.35, len * 0.18)
+  mirrorR.position.set(wid / 2 + 0.08, body.position.y + 0.35, len * 0.18)
+  g.add(bumper, bumperR, mirrorL, mirrorR)
+
   g.userData = { wheels, head: headMat, brake: brakeMat, length: len }
   return g
 }
@@ -435,12 +445,13 @@ function updatePlayerCar(car, dt, player, city) {
   }
   car.mesh.visible = true
   const input = player.input
-  const accel = (input.forward ? 1 : 0) + (input.back ? -1 : 0)
-  car.speed += accel * 18 * dt
-  car.speed *= Math.pow(0.22, dt * (input.forward || input.back ? 0.15 : 1))
+  const ay = Math.abs(input.axisY) > 0.05 ? input.axisY : (input.forward ? 1 : 0) + (input.back ? -1 : 0)
+  const ax = Math.abs(input.axisX) > 0.05 ? input.axisX : (input.right ? 1 : 0) + (input.left ? -1 : 0)
+  car.speed += ay * 20 * dt
+  car.speed *= Math.pow(0.22, dt * (Math.abs(ay) > 0.08 ? 0.12 : 1))
   car.speed = THREE.MathUtils.clamp(car.speed, -8, car.max)
-  const steer = ((input.right ? 1 : 0) + (input.left ? -1 : 0)) * (car.speed >= 0 ? 1 : -1)
-  car.yaw -= steer * dt * 1.6 * Math.min(1, Math.abs(car.speed) / 6)
+  const steer = ax * (car.speed >= 0 ? 1 : -1)
+  car.yaw -= steer * dt * 1.85 * Math.min(1, Math.abs(car.speed) / 5.5)
   car.mesh.rotation.y = car.yaw
   const nx = car.mesh.position.x + Math.sin(car.yaw) * car.speed * dt
   const nz = car.mesh.position.z + Math.cos(car.yaw) * car.speed * dt

@@ -11,16 +11,17 @@ npm run dev
 
 Open the printed local URL. Use **Cinematic** to orbit the skyline, **Walk** to explore on foot, or **Drive** the red car.
 
-## Controls
+## Phone gestures
 
-| Input | Action |
-| --- | --- |
-| `W A S D` | Walk / steer |
-| Mouse | Look (click the town first) |
-| `Shift` | Sprint |
-| `C` | Cycle camera |
-| `H` | Hide UI |
-| Day-cycle slider | Speed up sunrise and dusk |
+Built for touch. Open the live preview on your phone:
+
+| Gesture | Explore | Walk / Drive |
+| --- | --- | --- |
+| One finger drag | Orbit the town | Look around |
+| Pinch | Zoom in / out | Zoom camera |
+| Two fingers drag | Pan across the map | — |
+| Left stick | — | Move or steer |
+| Double-tap | Reset view | — |
 
 ## What’s in the town
 

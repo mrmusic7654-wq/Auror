@@ -21,8 +21,9 @@ function progress(p, msg) {
 
 progress(8, 'Laying streets')
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75))
+const mobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 900
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, powerPreference: 'high-performance' })
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.35 : 1.75))
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -40,7 +41,7 @@ const hemi = new THREE.HemisphereLight(0xbcd6ff, 0x3d4a32, 0.55)
 scene.add(hemi)
 const sunLight = new THREE.DirectionalLight(0xfff4d6, 1.6)
 sunLight.castShadow = true
-sunLight.shadow.mapSize.set(2048, 2048)
+sunLight.shadow.mapSize.set(mobile ? 1024 : 2048, mobile ? 1024 : 2048)
 sunLight.shadow.camera.near = 1
 sunLight.shadow.camera.far = 420
 const s = 160
@@ -88,6 +89,10 @@ const toast = document.getElementById('toast')
 const hud = document.getElementById('hud')
 const panel = document.getElementById('panel')
 const crosshair = document.getElementById('crosshair')
+const joystick = document.getElementById('joystick')
+const gestureHint = document.getElementById('gesture-hint')
+const lookHint = document.getElementById('look-hint')
+const joyLabel = document.getElementById('joy-label')
 
 peopleEl.textContent = String(CFG.people)
 carEl.textContent = String(CFG.cars + 1)
@@ -117,9 +122,26 @@ function setMode(mode) {
   for (const b of modes.querySelectorAll('button')) {
     b.classList.toggle('active', b.dataset.mode === mode)
   }
+  const exploring = mode === 'cinematic'
   crosshair.classList.toggle('hidden', mode !== 'walk')
-  showToast(mode === 'cinematic' ? 'Cinematic camera' : mode === 'walk' ? 'On foot — click to look around' : 'Driving — WASD to steer')
+  joystick.classList.toggle('hidden', exploring)
+  gestureHint.classList.toggle('hidden', !exploring)
+  lookHint.classList.toggle('hidden', exploring)
+  if (joyLabel) joyLabel.textContent = mode === 'drive' ? 'Steer' : 'Move'
+  const msg = exploring
+    ? 'Drag to orbit · pinch to zoom'
+    : mode === 'walk'
+      ? 'Left stick moves · drag screen to look'
+      : 'Left stick drives · pinch to zoom camera'
+  showToast(msg)
+  try { navigator.vibrate?.(12) } catch { /* ignore */ }
 }
+
+document.getElementById('reset-view')?.addEventListener('click', () => {
+  player.resetView()
+  setMode('cinematic')
+  showToast('View reset')
+})
 
 window.addEventListener('keydown', (e) => {
   if (e.code === 'KeyC') {
@@ -197,7 +219,7 @@ requestAnimationFrame(() => {
   hud.classList.remove('hidden')
   panel.classList.remove('hidden')
   loader.classList.add('gone')
-  showToast('Astra is awake')
+  showToast('Drag the town with your finger')
   setMode('cinematic')
 })
 

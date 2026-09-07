@@ -2,7 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>ASTRA — Living Town Simulator</title>
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -25,7 +31,7 @@
           <span class="mark">A</span>
           <div>
             <strong>ASTRA</strong>
-            <em>Living town simulator</em>
+            <em>3D town simulator</em>
           </div>
         </div>
         <div class="stats">
@@ -35,24 +41,32 @@
           <div><label>Weather</label><b id="weather">Clear</b></div>
         </div>
         <div class="modes" id="modes">
-          <button data-mode="cinematic" class="active">Cinematic</button>
-          <button data-mode="walk">Walk</button>
-          <button data-mode="drive">Drive</button>
+          <button type="button" data-mode="cinematic" class="active">Explore</button>
+          <button type="button" data-mode="walk">Walk</button>
+          <button type="button" data-mode="drive">Drive</button>
         </div>
       </header>
 
       <aside id="panel" class="hidden">
-        <label>Day cycle <span id="speed-label">x1</span></label>
+        <label>Day cycle <span id="speed-label">x8</span></label>
         <input id="time-speed" type="range" min="0" max="60" value="8" />
         <label>Hour</label>
         <input id="hour" type="range" min="0" max="24" step="0.05" value="8.5" />
-        <div class="hint">
-          <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p>
-          <p><kbd>Mouse</kbd> look · <kbd>Shift</kbd> sprint</p>
-          <p><kbd>Space</kbd> fly up · <kbd>C</kbd> cycle camera</p>
-          <p><kbd>F</kbd> headlights · <kbd>H</kbd> hide UI</p>
-        </div>
+        <button type="button" id="reset-view">Reset view</button>
       </aside>
+
+      <div id="gesture-hint">
+        <b>Drag</b> look · <b>Pinch</b> zoom · <b>Two fingers</b> pan
+      </div>
+
+      <div id="joystick" class="hidden">
+        <div class="stick-base">
+          <div class="stick-knob"></div>
+        </div>
+        <span id="joy-label">Move</span>
+      </div>
+
+      <div id="look-hint" class="hidden">Drag here to look</div>
 
       <div id="crosshair" class="hidden"></div>
       <div id="toast"></div>

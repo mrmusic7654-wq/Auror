@@ -150,6 +150,7 @@ export function createCity(scene) {
     }
   }
 
+  addCrosswalks(n, dashGeos)
   addMesh(scene, merge(roadGeos), mats.asphalt, true)
   addMesh(scene, merge(walkGeos), mats.walk, true)
   addMesh(scene, merge(lineGeos), mats.line, false)
@@ -167,6 +168,8 @@ export function createCity(scene) {
   const lamps = buildLamps(scene, lampPositions, mats)
   buildTrafficLights(scene, n, mats, trafficLights)
   scatterStreetProps(scene, n, mats)
+  addHills(scene, span)
+  addClouds(scene)
 
   const nightMaterials = mats.glassNight
   const lampGlows = lamps.glows
@@ -313,7 +316,13 @@ function placeTower(x, z, w, d, h, rnd, buckets, colliders, facades) {
   buckets.concrete.push(boxAt(w + 0.6, 1.2, d + 0.6, cx, 0.6, cz))
   buckets.dark.push(boxAt(w * 0.4, 2.2, d * 0.3, cx, h + 1.1, cz))
   if (rnd() > 0.4) buckets.metal.push(cylAt(0.08, 0.08, 4 + rnd() * 6, cx + w * 0.2, h + 4, cz, 5))
-  // setbacks
+  for (let ly = 7; ly < h - 3; ly += 6 + rnd() * 3) {
+    buckets.concrete.push(boxAt(w + 0.35, 0.22, d + 0.35, cx, ly, cz))
+  }
+  if (h > 22) {
+    buckets.white.push(boxAt(1.1, 0.1, 0.7, cx - w * 0.35, 8.2, z - 0.15))
+    buckets.white.push(boxAt(1.1, 0.1, 0.7, cx + w * 0.35, 12.2, z - 0.15))
+  }
   if (h > 30) {
     buckets.dark.push(boxAt(w * 0.7, 3, d * 0.7, cx, h - 1.2, cz))
   }
@@ -351,6 +360,8 @@ function placeHouse(x, z, w, d, h, rnd, buckets, colliders) {
   buckets.dark.push(boxAt(0.9, 1.8, 0.08, cx, 0.95, z + 0.04))
   buckets.white.push(boxAt(0.7, 0.8, 0.06, cx - w * 0.22, 2.2, z + 0.04))
   buckets.white.push(boxAt(0.7, 0.8, 0.06, cx + w * 0.22, 2.2, z + 0.04))
+  buckets.white.push(boxAt(1.4, 0.12, 0.55, cx, 2.6, z - 0.2))
+  buckets.leaf.push(cylAt(0.05, 0.55, 0.9, x + 0.7, 0.7, z + d + 0.6, 6))
   colliders.push({ minX: x, maxX: x + w, minZ: z, maxZ: z + d, h: h + 2 })
 }
 
@@ -440,5 +451,57 @@ function scatterStreetProps(scene, n, mats) {
         scene.add(h)
       }
     }
+  }
+}
+
+function addCrosswalks(n, dashGeos) {
+  for (let i = 0; i <= n; i++) {
+    for (let j = 0; j <= n; j++) {
+      const p = intersectionPos(i, j)
+      const hw = CFG.road * 0.42
+      for (let s = -2; s <= 2; s++) {
+        dashGeos.push(boxAt(0.45, 0.03, 2.4, p.x + s * 0.7, 0.1, p.z + hw))
+        dashGeos.push(boxAt(0.45, 0.03, 2.4, p.x + s * 0.7, 0.1, p.z - hw))
+        dashGeos.push(boxAt(2.4, 0.03, 0.45, p.x + hw, 0.1, p.z + s * 0.7))
+        dashGeos.push(boxAt(2.4, 0.03, 0.45, p.x - hw, 0.1, p.z + s * 0.7))
+      }
+    }
+  }
+}
+
+function addHills(scene, span) {
+  const hillMat = new THREE.MeshStandardMaterial({ color: 0x3f6a3a, roughness: 0.95 })
+  const rock = new THREE.MeshStandardMaterial({ color: 0x6d6a64, roughness: 0.9 })
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2 + 0.2
+    const r = span * 0.62 + (i % 3) * 28
+    const h = 18 + (i % 5) * 7
+    const mesh = new THREE.Mesh(new THREE.ConeGeometry(22 + (i % 4) * 8, h, 7), i % 4 === 0 ? rock : hillMat)
+    mesh.position.set(Math.cos(a) * r, h * 0.28, Math.sin(a) * r)
+    mesh.rotation.y = a
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    scene.add(mesh)
+  }
+}
+
+function addClouds(scene) {
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0xf4f7fb, roughness: 1, transparent: true, opacity: 0.88,
+  })
+  for (let i = 0; i < 16; i++) {
+    const g = new THREE.Group()
+    const n = 3 + (i % 3)
+    for (let k = 0; k < n; k++) {
+      const s = new THREE.Mesh(new THREE.SphereGeometry(6 + (k % 3) * 3, 8, 8), mat)
+      s.position.set(k * 7 - 6, (k % 2) * 2, (k - 1) * 3)
+      s.scale.set(1.6, 0.55, 1.1)
+      g.add(s)
+    }
+    const a = Math.random() * Math.PI * 2
+    const r = 40 + Math.random() * 140
+    g.position.set(Math.cos(a) * r, 48 + Math.random() * 22, Math.sin(a) * r)
+    g.scale.setScalar(0.8 + Math.random() * 0.8)
+    scene.add(g)
   }
 }
