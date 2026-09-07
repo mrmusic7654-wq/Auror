@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +17,7 @@ import javax.inject.Singleton
  * back to a process-memory vault rather than crashing, and never persist plaintext.
  */
 @Singleton
-class CredentialBroker @Inject constructor(@androidx.annotation.ApplicationContext context: Context) {
+class CredentialBroker @Inject constructor(@ApplicationContext context: Context) {
 
     private val logTag = "AuraCredentialBroker"
     private val memoryVault = HashMap<String, String>()
