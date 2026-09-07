@@ -35,10 +35,28 @@ jobs:
       - name: Set up Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Compile & run JVM tests
+      - name: Compile & run JVM tests (capture log)
+        shell: bash
         run: |
-          ./gradlew :core:test --stacktrace
-          ./gradlew :app:testDebugUnitTest --stacktrace
+          set -o pipefail
+          ./gradlew :core:test --stacktrace 2>&1 | tee /tmp/build.log
+          ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee -a /tmp/build.log
+
+      - name: Publish compile errors to an issue (on failure)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          {
+            echo "## AURA CI build failed ($(date -u +%Y-%m-%dT%H:%MZ))"
+            echo
+            echo '```'
+            grep -aE "e: |error:|FAILURE:|What went wrong|Caused by:|Unresolved reference|cannot|> Task .* FAILED|Could not|Exception" /tmp/build.log | head -400
+            echo '```'
+          } > /tmp/body.md
+          gh issue create --title "AURA CI build failure" --body-file /tmp/body.md --label "ci-fail" >/dev/null 2>&1 || \
+            gh issue create --title "AURA CI build failure" --body-file /tmp/body.md >/dev/null 2>&1 || true
 
       - name: Assemble debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
