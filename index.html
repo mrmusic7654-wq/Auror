@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASTRA — Living Town Simulator</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="c"></canvas>
+
+      <div id="loader">
+        <div class="loader-inner">
+          <div class="loader-mark">A</div>
+          <h1>ASTRA</h1>
+          <p>Building a living town…</p>
+          <div class="bar"><div id="bar-fill"></div></div>
+          <span id="load-msg">Laying streets</span>
+        </div>
+      </div>
+
+      <header id="hud" class="hidden">
+        <div class="brand">
+          <span class="mark">A</span>
+          <div>
+            <strong>ASTRA</strong>
+            <em>Living town simulator</em>
+          </div>
+        </div>
+        <div class="stats">
+          <div><label>Time</label><b id="clock">07:30</b></div>
+          <div><label>People</label><b id="people-count">0</b></div>
+          <div><label>Vehicles</label><b id="car-count">0</b></div>
+          <div><label>Weather</label><b id="weather">Clear</b></div>
+        </div>
+        <div class="modes" id="modes">
+          <button data-mode="cinematic" class="active">Cinematic</button>
+          <button data-mode="walk">Walk</button>
+          <button data-mode="drive">Drive</button>
+        </div>
+      </header>
+
+      <aside id="panel" class="hidden">
+        <label>Day cycle <span id="speed-label">x1</span></label>
+        <input id="time-speed" type="range" min="0" max="60" value="8" />
+        <label>Hour</label>
+        <input id="hour" type="range" min="0" max="24" step="0.05" value="8.5" />
+        <div class="hint">
+          <p><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</p>
+          <p><kbd>Mouse</kbd> look · <kbd>Shift</kbd> sprint</p>
+          <p><kbd>Space</kbd> fly up · <kbd>C</kbd> cycle camera</p>
+          <p><kbd>F</kbd> headlights · <kbd>H</kbd> hide UI</p>
+        </div>
+      </aside>
+
+      <div id="crosshair" class="hidden"></div>
+      <div id="toast"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
